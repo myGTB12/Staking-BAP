@@ -157,11 +157,11 @@ contract Staking is Ownable{
             uint pending = user.amount.mul(pool.accRewardPershared).div(1e12).sub(user.rewardDebt);
             if(pending > 0){
                 user.accumulatedStakingPower = user.accumulatedStakingPower.add(pending);
-                pool.rewardToken.safeTransfer(address(msg.sender), pending);
+                pool.rewardToken.safeTransfer(msg.sender, pending);
             }
             if(_amount > 0){
-                user.amount = user.amount.sub(_amount);
-                pool.lpToken.safeTransfer(address(msg.sender), _amount);
+                pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
+                user.amount = user.amount.add(_amount);
             }
             user.rewardDebt = user.amount.mul(pool.accRewardPershared).div(1e12);
             emit Deposit(msg.sender, _pid, _amount);
