@@ -33,17 +33,23 @@ describe("Staking", function(){
         
         it("add", async function(){
             await stakingContract.add(100, lptoken.address, rewardToken.address, false, 100);
-            expect(await stakingContract.poolLength()).to.equal(1); 
-             
+            expect(await stakingContract.poolLength()).to.equal(1);          
         });
 
         it('deposit', async function(){
             await stakingContract.add(100, lptoken.address, rewardToken.address, true, 100);
-            await lptoken.approve(stakingContract.address, 500);
+            await (await lptoken.connect(address1).approve(stakingContract.address, 500)).wait();
             await stakingContract.connect(address1).deposit(0, 500);
-            // await stakingContract.connect(address1).deposit(0, 0);
-            console.log(await lptoken.balanceOf(address1.address));
-            expect(await lptoken.balanceOf(address1.address)).to.equal(1950);
+            expect(await lptoken.balanceOf(address1.address)).to.equal(1500);
+            expect(await lptoken.balanceOf(stakingContract.address)).to.equal(500);
+            
+            await stakingContract.connect(address1).deposit(0, 0);
+            console.log(await stakingContract.blockNumber());
+            console.log(await stakingContract.poolInfo(0));
+        });
+        it('withdraw', async function(){
+            await stakingContract.add(100, lptoken.address, rewardToken.address, true, 100);
         });
     });
+
 })
