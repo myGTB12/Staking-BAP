@@ -2,7 +2,6 @@
 const {ethers} = require("hardhat");
 const {expect} = require("chai");
 
-
 describe("Staking", function(){
     let owner;
     let address1;
@@ -42,8 +41,7 @@ describe("Staking", function(){
             await (await lptoken.connect(address1).approve(stakingContract.address, 500)).wait();
             await stakingContract.connect(address1).deposit(0, 500);
             expect(await lptoken.balanceOf(address1.address)).to.equal(1500);
-            expect(await lptoken.balanceOf(stakingContract.address)).to.equal(500);
-            
+            expect(await lptoken.balanceOf(stakingContract.address)).to.equal(500);            
             // await stakingContract.connect(address1).deposit(0, 0);
             // console.log(await stakingContract.blockNumber());
             // let data = new Object(await stakingContract.poolInfo(0))
@@ -53,10 +51,7 @@ describe("Staking", function(){
             // await (await rewardToken.connect(stakingContract.address).approve(address1.address, 500));
             await stakingContract.connect(address1).withdraw(0, 300);
             expect(await lptoken.balanceOf(stakingContract.address)).to.equal(200);
-            expect(await lptoken.balanceOf(address1.address)).to.equal(1800);
-            
+            expect(await lptoken.balanceOf(address1.address)).to.equal(1800);           
         });
-
     });
-
 })
