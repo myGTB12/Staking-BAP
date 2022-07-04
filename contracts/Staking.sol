@@ -154,14 +154,10 @@ contract Staking is Ownable{
         UserInfor storage user = userInfo[_pid][msg.sender];
         updatePool(_pid);
         if (user.amount > 0) {
-            uint pending = user.amount.mul(pool.accRewardPershared).div(1e12).sub(user.rewardDebt);
+            uint256 pending = user.amount.mul(pool.accRewardPershared).div(1e12).sub(user.rewardDebt);
             if(pending > 0) {
                 user.accumulatedStakingPower = user.accumulatedStakingPower.add(pending);
-                pool.rewardToken.safeTransferFrom(
-                    address(msg.sender),
-                    address(this),
-                    _amount
-                );
+                pool.rewardToken.safeTransferFrom(msg.sender, address(this), pending);
             }
         }
         if(_amount > 0) {
@@ -179,7 +175,7 @@ contract Staking is Ownable{
         uint pending = user.amount.mul(pool.accRewardPershared).div(1e12).sub(user.rewardDebt);
         if(pending > 0){
             user.accumulatedStakingPower = user.accumulatedStakingPower.add(pending);
-            pool.rewardToken.safeTransfer(msg.sender, pending);
+            // IERC20(pool.rewardToken).transfer(msg.sender, pending);
         }
         if(_amount > 0){
             user.amount = user.amount.sub(_amount);
@@ -188,6 +184,10 @@ contract Staking is Ownable{
         user.rewardDebt = user.rewardDebt.mul(pool.accRewardPershared).div(1e12);
         emit Withdraw(msg.sender, _pid, _amount);
     }
+
+    // function safeRewardTransfer(address _to,uint _amount) internal{
+         
+    // }
     function blockNumber() public view returns(uint){
         return block.number;
     }
