@@ -14,12 +14,6 @@ async function main() {
   // // await hre.run('compile');
 
   // // We get the contract to deploy
-  // const Staking = await hre.ethers.getContractFactory("Staking");
-  // const staking = await Staking.deploy("Hello, Hardhat!");
-
-  // await Staking.deployed();
-
-  // console.log("Greeter deployed to:", staking.address);
   const Staking = await hre.ethers.getContractFactory("Staking");
   const staking = await Staking.deploy(20000, 30000);
 

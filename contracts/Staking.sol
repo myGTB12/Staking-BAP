@@ -153,19 +153,23 @@ contract Staking is Ownable{
         PoolInfor storage pool = poolInfo[_pid];
         UserInfor storage user = userInfo[_pid][msg.sender];
         updatePool(_pid);
-        if(user.amount > 0){
+        if (user.amount > 0) {
             uint pending = user.amount.mul(pool.accRewardPershared).div(1e12).sub(user.rewardDebt);
-            if(pending > 0){
+            if(pending > 0) {
                 user.accumulatedStakingPower = user.accumulatedStakingPower.add(pending);
-                pool.rewardToken.safeTransfer(msg.sender, pending);
+                pool.rewardToken.safeTransferFrom(
+                    address(msg.sender),
+                    address(this),
+                    _amount
+                );
             }
-            if(_amount > 0){
-                pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
-                user.amount = user.amount.add(_amount);
-            }
-            user.rewardDebt = user.amount.mul(pool.accRewardPershared).div(1e12);
-            emit Deposit(msg.sender, _pid, _amount);
         }
+        if(_amount > 0) {
+            pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
+            user.amount = user.amount.add(_amount);
+        }
+        user.rewardDebt = user.amount.mul(pool.accRewardPershared).div(1e12);
+        emit Deposit(msg.sender, _pid, _amount);
     }
     function withdraw(uint _pid, uint _amount) public{
         PoolInfor storage pool = poolInfo[_pid];
@@ -183,5 +187,8 @@ contract Staking is Ownable{
         }
         user.rewardDebt = user.rewardDebt.mul(pool.accRewardPershared).div(1e12);
         emit Withdraw(msg.sender, _pid, _amount);
+    }
+    function blockNumber() public view returns(uint){
+        return block.number;
     }
 }
