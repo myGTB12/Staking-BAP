@@ -22,7 +22,8 @@ describe("Staking", function(){
         LPToken = await ethers.getContractFactory("LPToken");
         lptoken = await LPToken.deploy();
         await lptoken.transfer(address1.address, 2000);
-        await rewardToken.transfer(stakingContract.address, 5000);
+        await lptoken.transfer(address2.address, 5000);
+        await rewardToken.transfer(stakingContract.address, 1000000);
     });
 
     describe("Staking constract ", function(){
@@ -38,20 +39,25 @@ describe("Staking", function(){
 
         it('deposit/withdraw', async function(){
             await stakingContract.add(1000, lptoken.address, rewardToken.address, false, 10);
+
             await (await lptoken.connect(address1).approve(stakingContract.address, 500)).wait();
             await stakingContract.connect(address1).deposit(0, 500);
             expect(await lptoken.balanceOf(address1.address)).to.equal(1500);
             expect(await lptoken.balanceOf(stakingContract.address)).to.equal(500);            
-            // await stakingContract.connect(address1).deposit(0, 0);
-            // console.log(await stakingContract.blockNumber());
-            // let data = new Object(await stakingContract.poolInfo(0))
-            // console.log(typeof(data),data,data.lastRewardBlock);
-            // console.log(await stakingContract.blockNumber());
-            // console.log(await rewardToken.balanceOf(stakingContract.address));
-            // await (await rewardToken.connect(stakingContract.address).approve(address1.address, 500));
+            
+            console.log(await rewardToken.balanceOf(stakingContract.address));
             await stakingContract.connect(address1).withdraw(0, 300);
             expect(await lptoken.balanceOf(stakingContract.address)).to.equal(200);
-            expect(await lptoken.balanceOf(address1.address)).to.equal(1800);           
+            expect(await lptoken.balanceOf(address1.address)).to.equal(1800);  
+            
+            await(await lptoken.connect(address2).approve(stakingContract.address, 2000)).wait();
+            await stakingContract.connect(address2).deposit(0, 2000);
+            expect(await lptoken.balanceOf(address2.address)).to.equal(3000);
+            expect(await lptoken.balanceOf(stakingContract.address)).to.equal(2200);
+
+            await stakingContract.connect(address2).withdraw(0, 1200);
+            expect(await lptoken.balanceOf(stakingContract.address)).to.equal(1000);
+            expect(await lptoken.balanceOf(address2.address)).to.equal(4200);
         });
     });
 })
